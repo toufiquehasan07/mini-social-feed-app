@@ -1,10 +1,10 @@
 const express = require('express');
 const User = require('../models/User');
 const { hashPassword, comparePassword } = require('../utils/bcrypt');
-const { generateRefreshToken, generateAccessToken } = require("../utils/jwt");
+const jwt = require("../utils/jwt");
 
 exports.signUp = async (req, res) => {
-    const { email, password, username } = req.body;
+    const { email, password, username, name } = req.body;
 
     let user = await User.findOne({
         email: email
@@ -20,6 +20,7 @@ exports.signUp = async (req, res) => {
     user = await User.create({
         username: username,
         email: email,
+        name: name,
         password: await hashPassword(password)
     });
 
@@ -57,11 +58,40 @@ exports.login = async (req, res) => {
         message: "Login successful",
         data: {
             user: userInfo,
-            accessToken: generateAccessToken(user),
-            refreshToken: generateRefreshToken(user)
+            accessToken: jwt.generateAccessToken(user),
+            refreshToken: jwt.generateRefreshToken(user)
         }
     });
-
 }
 
+exports.refreshToken = async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: "Missing refresh token"
+        });
+    }
+
+    try {
+        const decoded = jwt.verifyRefreshToken(token);
+        const newAccessToken = jwt.generateAccessToken(decoded);
+        return res.status(200).json({
+            success: true,
+            message: "Token refreshed successfully.",
+            data: {
+                id: decoded.id,
+                accessToken: newAccessToken,
+                refreshToken: token,
+            }
+        })
+    } catch (err) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired refresh token"
+        });
+    }
+
+}
 

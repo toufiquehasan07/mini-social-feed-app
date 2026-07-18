@@ -27,3 +27,11 @@ exports.generateRefreshToken = (user) => {
         }
     );
 }
+
+exports.verifyAccessToken = (token) => {
+    return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+}
+
+exports.verifyRefreshToken = (token) => {
+    return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+}
