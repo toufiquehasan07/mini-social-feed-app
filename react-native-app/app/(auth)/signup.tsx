@@ -8,30 +8,63 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
 import { Colors, FontSize, Spacing } from "../../constants/theme";
+import { useDispatch, useSelector } from "react-redux";
+import { isLoading, signupThunk } from "@/store/authSlice";
 
 const SignupScreen = () => {
   const router = useRouter();
+  const dispatch = useDispatch<any>();
+
+  const loading = useSelector(isLoading);
+
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const canSubmit = !!name && !!username && !!email && !!password && !loading;
+  const canSubmit =
+    !!name &&
+    !!username &&
+    !!email &&
+    !!password &&
+    !loading;
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!canSubmit) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.replace("/(tabs)");
-    }, 500);
+
+    try {
+      const message = await dispatch(
+        signupThunk({
+          name,
+          username,
+          email,
+          password,
+        })
+      ).unwrap();
+
+      Alert.alert(
+        "Registration Successful",
+        message || "Your account has been created successfully. Please login.",
+        [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(auth)/login"),
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        "Registration Failed",
+        error || "Something went wrong."
+      );
+    }
   };
 
   return (

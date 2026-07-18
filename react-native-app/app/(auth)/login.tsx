@@ -7,29 +7,43 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View
+  View,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FormField from "../../components/FormField";
 import PrimaryButton from "../../components/PrimaryButton";
 import { Colors, FontSize, Spacing } from "../../constants/theme";
-
+import { useDispatch, useSelector } from "react-redux";
+import { loginThunk, isLoading } from "@/store/authSlice";
 
 const LoginScreen = () => {
+  const dispatch = useDispatch<any>();
   const router = useRouter();
+  const loading = useSelector(isLoading);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const canSubmit = !!email && !!password && !loading;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!canSubmit) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      await dispatch(
+        loginThunk({
+          email,
+          password,
+        })
+      ).unwrap();
+
       router.replace("/(tabs)");
-    }, 500);
+    } catch (error: any) {
+      Alert.alert(
+        "Login Failed",
+        error || "Something went wrong."
+      );
+    }
   };
 
   return (
