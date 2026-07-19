@@ -1,19 +1,19 @@
 const express = require('express');
 const User = require('../models/User');
 const { hashPassword, comparePassword } = require('../utils/bcrypt');
-const jwt = require("../utils/jwt");
+const jwt = require('../utils/jwt');
 
 exports.signUp = async (req, res) => {
     const { email, password, username, name } = req.body;
 
     let user = await User.findOne({
-        email: email
+        email: email,
     });
 
     if (user) {
         return res.status(409).json({
             success: false,
-            message: "User already exists with the same email",
+            message: 'User already exists with the same email',
         });
     }
 
@@ -21,23 +21,27 @@ exports.signUp = async (req, res) => {
         username: username,
         email: email,
         name: name,
-        password: await hashPassword(password)
+        password: await hashPassword(password),
     });
 
-    res.status(200).json({ success: true, message: "User created successfully", data: user });
-}
+    res.status(200).json({
+        success: true,
+        message: 'User created successfully',
+        data: user,
+    });
+};
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     const user = await User.findOne({
-        email: email
+        email: email,
     });
 
     if (!user) {
         return res.status(401).json({
             success: false,
-            message: "Invalid email or password",
+            message: 'Invalid email or password',
         });
     }
 
@@ -46,23 +50,23 @@ exports.login = async (req, res) => {
     if (!isMatched) {
         return res.status(401).json({
             success: false,
-            message: "Invalid email or password",
+            message: 'Invalid email or password',
         });
     }
 
     const userInfo = user.toObject();
-    delete userInfo["password"];
+    delete userInfo['password'];
 
     return res.status(200).json({
         success: true,
-        message: "Login successful",
+        message: 'Login successful',
         data: {
             user: userInfo,
             accessToken: jwt.generateAccessToken(user),
-            refreshToken: jwt.generateRefreshToken(user)
-        }
+            refreshToken: jwt.generateRefreshToken(user),
+        },
     });
-}
+};
 
 exports.refreshToken = async (req, res) => {
     const { token } = req.body;
@@ -70,7 +74,7 @@ exports.refreshToken = async (req, res) => {
     if (!token) {
         return res.status(401).json({
             success: false,
-            message: "Missing refresh token"
+            message: 'Missing refresh token',
         });
     }
 
@@ -79,19 +83,17 @@ exports.refreshToken = async (req, res) => {
         const newAccessToken = jwt.generateAccessToken(decoded);
         return res.status(200).json({
             success: true,
-            message: "Token refreshed successfully.",
+            message: 'Token refreshed successfully.',
             data: {
                 id: decoded.id,
                 accessToken: newAccessToken,
                 refreshToken: token,
-            }
-        })
+            },
+        });
     } catch (err) {
         return res.status(401).json({
             success: false,
-            message: "Invalid or expired refresh token"
+            message: 'Invalid or expired refresh token',
         });
     }
-
-}
-
+};

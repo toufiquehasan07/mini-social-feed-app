@@ -1,18 +1,16 @@
 const mongoose = require('mongoose');
 
-const postSchema = new mongoose.Schema(
+const likeSchema = new mongoose.Schema(
     {
-        author: {
+        user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
-
-        content: {
-            type: String,
+        post: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
             required: true,
-            trim: true,
-            maxlength: 500,
         },
     },
     {
@@ -21,6 +19,4 @@ const postSchema = new mongoose.Schema(
     },
 );
 
-const Post = mongoose.model('Post', postSchema);
-
-module.exports = Post;
+module.exports = mongoose.model('Like', likeSchema);
