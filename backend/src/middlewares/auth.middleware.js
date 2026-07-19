@@ -14,7 +14,7 @@ exports.verifyToken = async (req, res, next) => {
 
     try {
         const decoded = verifyAccessToken(token);
-        req.body.user = decoded;
+        req.user = decoded;
         next();
     } catch (error) {
         return res.status(401).json({
