@@ -1,10 +1,10 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from '@/store/authSlice';
-import postReducer from '@/store/postsSlice';
+import postsReducer from '@/store/postsSlice';
 
 const appReducer = combineReducers({
     auth: authReducer,
-    post: postReducer
+    posts: postsReducer
 });
 
 const rootReducer = (state: any, action: any) => {

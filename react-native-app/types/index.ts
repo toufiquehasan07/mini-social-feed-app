@@ -8,8 +8,8 @@ export interface User {
 interface Response {
     // success: boolean,
     // message: string,
-    createdAt: string,
-    updatedAt: string
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface AuthResponse {
@@ -24,14 +24,18 @@ export interface AuthResponse {
 }
 
 export interface Post extends Response {
-    _id: string,
+    _id: string;
     author: {
-        _id: string,
-        email: string,
-        username: string,
-        name: string
-    },
-    content: string,
+        _id: string;
+        email: string;
+        username: string;
+        name: string;
+    };
+    content: string;
+    likes: number;
+    liked: boolean;
+    commented: boolean;
+    comments: any[];
 }
 
 export interface Comment {
@@ -42,19 +46,9 @@ export interface Comment {
     time: string;
 }
 
-export interface Post {
-    id: string;
-    userId: string;
-    user: User;
-    text: string;
-    time: string;
-    likes: string[];
-    comments: Comment[];
-}
-
 export interface Notif {
     id: string;
-    type: "like" | "comment";
+    type: 'like' | 'comment';
     fromUser: User;
     postPreview: string;
     time: string;

@@ -1,24 +1,24 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { APP_CONFIG } from '@/config';
-import { refreshAccessToken, logout, getAccessToken } from "./auth.service";
+import { refreshAccessToken, logout, getAccessToken } from './auth.service';
 
 const baseURL = `${APP_CONFIG.serverUrl}:${APP_CONFIG.port}/api/${APP_CONFIG.apiVersion}`;
 const headers = {
-    'Content-Type': 'application/json'
-}
+    'Content-Type': 'application/json',
+};
 
 export const axiosAuthClient = async (
     config: AxiosRequestConfig<any>,
 ): Promise<AxiosResponse<any, any, {}>> => {
     const axiosInstance = axios.create({
         baseURL,
-        headers
+        headers,
     });
 
     axiosInstance.interceptors.request.use(
         async (config: any) => {
             const accessToken = await getAccessToken();
-
+            // console.log('info access token: ', accessToken);
             if (accessToken) {
                 config.headers = {
                     ...config.headers,
@@ -27,12 +27,14 @@ export const axiosAuthClient = async (
             }
             return config;
         },
-        error => Promise.reject(error),
+        (error) => Promise.reject(error),
     );
 
     axiosInstance.interceptors.response.use(
-        response => response,
-        async error => {
+        (response) => response,
+        async (error) => {
+            // console.log('Status:', error.response?.status);
+            // console.log('URL:', error.config?.url);
             const config = error.config;
 
             if (error.response?.status === 401 && !config.sent) {
@@ -65,7 +67,7 @@ export const axiosClient = async (
 ): Promise<AxiosResponse<any, any, {}>> => {
     const axiosInstance = axios.create({
         baseURL,
-        headers
+        headers,
     });
     return axiosInstance(config);
 };

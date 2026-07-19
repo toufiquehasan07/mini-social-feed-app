@@ -1,98 +1,172 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+    ActivityIndicator,
+    FlatList,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Avatar from '@/components/Avatar';
+import PostCard from '@/components/PostCard';
+import { Colors, FontSize, Spacing } from '@/constants/theme';
+import { fetchPosts, selectPosts, selectPostsStatus } from '@/store/postsSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser } from '@/store/authSlice';
+import { FAB } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function FeedScreen() {
+    const router = useRouter();
+    const dispatch = useDispatch<any>();
+    const posts = useSelector(selectPosts);
+    // console.log('info posts: ', posts);
+    const user = useSelector(selectUser);
+    const status = useSelector(selectPostsStatus);
 
-export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
+    const [filter, setFilter] = useState('');
+
+    useEffect(() => {
+        if (status === 'idle') {
+            dispatch(fetchPosts());
+        }
+    }, [status]);
+
+    const filteredPosts = useMemo(() => {
+        if (!filter.trim()) return posts;
+        const q = filter.toLowerCase();
+        return posts.filter((post: any) => {
+            return (
+                post.author?.name?.toLowerCase().includes(q) ||
+                post.author?.username?.toLowerCase().includes(q)
+            );
+        });
+    }, [posts, filter]);
+
+    return (
+        <SafeAreaView style={styles.screen} edges={['top']}>
+            <FAB
+                icon="plus"
+                color={Colors.surface}
+                style={styles.fab}
+                onPress={() => {
+                    // console.log('info clicked');
+                    return router.push('/create');
+                }}
             />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+            <View style={styles.header}>
+                <View style={styles.topRow}>
+                    <View style={styles.brandRow}>
+                        <Text style={styles.brandText}>SocialFeed</Text>
+                    </View>
+                    <Avatar user={user} size="sm" />
+                </View>
+                <View style={styles.searchBar}>
+                    <Feather name="search" size={16} color={Colors.text3} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search..."
+                        placeholderTextColor={Colors.text3}
+                        value={filter}
+                        onChangeText={setFilter}
+                    />
+                    {!!filter && (
+                        <Pressable onPress={() => setFilter('')}>
+                            <Feather name="x" size={18} color={Colors.text4} />
+                        </Pressable>
+                    )}
+                </View>
+            </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
-  );
+            <FlatList
+                data={filteredPosts}
+                keyExtractor={(item: any) => item._id}
+                renderItem={({ item }) => (
+                    <PostCard post={item} onLike={() => {}} />
+                )}
+                refreshing={status === 'loading'}
+                onRefresh={() => dispatch(fetchPosts())}
+                ListEmptyComponent={() => {
+                    if (status === 'loading') {
+                        return (
+                            <View style={styles.empty}>
+                                <ActivityIndicator color={Colors.primary} />
+                            </View>
+                        );
+                    }
+                    return (
+                        <View style={styles.empty}>
+                            <Text>No posts available.</Text>
+                        </View>
+                    );
+                }}
+                contentContainerStyle={{
+                    paddingBottom: 20,
+                    flexGrow: filteredPosts.length === 0 ? 1 : 0,
+                }}
+            />
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+    screen: {
+        flex: 1,
+        backgroundColor: Colors.phoneBg,
+    },
+    fab: {
+        position: 'absolute',
+        right: 20,
+        bottom: 20,
+        zIndex: 999,
+        backgroundColor: Colors.primary,
+    },
+    header: {
+        padding: Spacing.lg,
+        borderBottomWidth: 1,
+        borderBottomColor: Colors.divider,
+    },
+    topRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: Spacing.md,
+    },
+    brandRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    brandIcon: {
+        width: 30,
+        height: 30,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
+    },
+    brandText: {
+        fontSize: FontSize.xxl,
+        fontWeight: '700',
+        color: Colors.text,
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: Colors.inputBg,
+        borderRadius: 12,
+        paddingHorizontal: 12,
+    },
+    searchInput: {
+        flex: 1,
+        paddingVertical: 10,
+        marginLeft: 8,
+    },
+    empty: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
