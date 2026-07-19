@@ -1,5 +1,5 @@
 import { axiosAuthClient, axiosClient } from './axios';
-import { AUTH_LOGIN, AUTH_SIGNUP, POSTS } from '@/constants/endpoints';
+import { AUTH_LOGIN, AUTH_SIGNUP, NOTIFICATION, POSTS } from '@/constants/endpoints';
 import { AuthResponse, Post } from '@/types';
 
 export const login = async (payload: {
@@ -45,6 +45,15 @@ export const createPost = async (payload: { content: string }) => {
         url: POSTS,
         data: payload,
     });
-    console.log('info data: ', data);
-    return data?.data?.message;
+    // console.log('info data: ', data);
+    return data?.data;
+};
+
+export const getUserNotifications = async (): Promise<Notification[]> => {
+    const { data } = await axiosAuthClient({
+        method: 'GET',
+        url: NOTIFICATION,
+    });
+    // console.log('info get notification data: ', data);
+    return data?.data;
 };

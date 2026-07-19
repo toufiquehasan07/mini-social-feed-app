@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema(
             minlength: 3,
             maxlength: 25,
         },
-
         email: {
             type: String,
             required: true,
@@ -24,7 +23,6 @@ const userSchema = new mongoose.Schema(
             minlength: 4,
             maxlength: 50,
         },
-
         password: {
             type: String,
             required: true,
@@ -38,6 +36,7 @@ const userSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
+        versionKey: false,
     },
 );
 

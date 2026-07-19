@@ -46,11 +46,14 @@ export interface Comment {
     time: string;
 }
 
-export interface Notif {
-    id: string;
-    type: 'like' | 'comment';
-    fromUser: User;
-    postPreview: string;
-    time: string;
-    read: boolean;
+interface ResponseUser extends User {
+    _id: string;
+}
+
+export interface Notification extends Response {
+    _id: string,
+    type: "liked" | "disliked" | "commented",
+    from: ResponseUser,
+    to: ResponseUser,
+    post: ResponseUser,
 }

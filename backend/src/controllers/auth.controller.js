@@ -23,11 +23,13 @@ exports.signUp = async (req, res) => {
         name: name,
         password: await hashPassword(password),
     });
+    const userInfo = user.toObject();
+    delete userInfo.password;
 
     res.status(200).json({
         success: true,
         message: 'User created successfully',
-        data: user,
+        data: userInfo,
     });
 };
 

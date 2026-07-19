@@ -1,10 +1,12 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from '@/store/authSlice';
 import postsReducer from '@/store/postsSlice';
+import notificationReducer from "@/store/notificationsSlice";
 
 const appReducer = combineReducers({
     auth: authReducer,
-    posts: postsReducer
+    posts: postsReducer,
+    notifications: notificationReducer
 });
 
 const rootReducer = (state: any, action: any) => {
