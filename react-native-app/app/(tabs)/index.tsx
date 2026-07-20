@@ -1,5 +1,5 @@
 import { Feather } from '@expo/vector-icons';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     FlatList,
@@ -17,7 +17,7 @@ import { fetchPosts, selectPosts, selectPostsStatus, toggleLikeThunk } from '@/s
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@/store/authSlice';
 import { FAB } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 
 export default function FeedScreen() {
     const router = useRouter();
@@ -29,11 +29,11 @@ export default function FeedScreen() {
 
     const [filter, setFilter] = useState('');
 
-    useEffect(() => {
-        if (status === 'idle') {
+    useFocusEffect(
+        useCallback(() => {
             dispatch(fetchPosts());
-        }
-    }, [status]);
+        }, [dispatch])
+    );
 
     const filteredPosts = useMemo(() => {
         if (!filter.trim()) return posts;

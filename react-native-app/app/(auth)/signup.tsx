@@ -40,7 +40,7 @@ const SignupScreen = () => {
     if (!canSubmit) return;
 
     try {
-      const message = await dispatch(
+      const response = await dispatch(
         signupThunk({
           name,
           username,
@@ -51,7 +51,7 @@ const SignupScreen = () => {
 
       Alert.alert(
         "Registration Successful",
-        message || "Your account has been created successfully. Please login.",
+        response?.message || "Your account has been created successfully. Please login.",
         [
           {
             text: "OK",
@@ -62,7 +62,7 @@ const SignupScreen = () => {
     } catch (error: any) {
       Alert.alert(
         "Registration Failed",
-        error || "Something went wrong."
+        error?.message || "Something went wrong."
       );
     }
   };

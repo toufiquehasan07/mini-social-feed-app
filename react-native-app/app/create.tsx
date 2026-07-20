@@ -29,9 +29,9 @@ const CreateScreen = () => {
         Keyboard.dismiss();
         if (!text.trim()) return;
         try {
-            const message = await dispatch(createPostThunk(text)).unwrap();
+            const response = await dispatch(createPostThunk(text)).unwrap();
             setText('');
-            Alert.alert('Greetings', message || 'Post created successfully!', [
+            Alert.alert('Greetings', response.message || 'Post created successfully!', [
                 {
                     text: 'OK',
                     onPress: () => router.back(),

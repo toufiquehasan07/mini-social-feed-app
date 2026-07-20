@@ -39,7 +39,7 @@ const LoginScreen = () => {
 
             router.replace('/(tabs)');
         } catch (error: any) {
-            Alert.alert('Login Failed', error || 'Something went wrong.');
+            Alert.alert('Login Failed', error?.message || 'Something went wrong.');
         }
     };
 

@@ -56,8 +56,7 @@ export const signupThunk = createAsyncThunk(
         { rejectWithValue },
     ) => {
         try {
-            const data = await apiService.signup(payload);
-            return data.message;
+            return await apiService.signup(payload);
         } catch (err: any) {
             return rejectWithValue(
                 err.response?.data?.message ?? 'Something went wrong',

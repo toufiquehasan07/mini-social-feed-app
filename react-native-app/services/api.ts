@@ -26,13 +26,13 @@ export const signup = async (payload: {
     username: string;
     password: string;
 }): Promise<AuthResponse> => {
-    const resp = await axiosClient({
+    const { data } = await axiosClient({
         method: 'POST',
         url: AUTH_SIGNUP,
         data: payload,
     });
 
-    return resp.data.data;
+    return data;
 };
 
 export const getPosts = async (): Promise<Post[]> => {
