@@ -34,7 +34,8 @@ exports.signUp = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, fcmToken } = req.body;
+    // console.log('info server got fcm token: ', fcmToken);
 
     const user = await User.findOne({
         email: email,
@@ -45,6 +46,11 @@ exports.login = async (req, res) => {
             success: false,
             message: 'Invalid email or password',
         });
+    }
+
+    if (fcmToken && user.fcmToken !== fcmToken) {
+        user.fcmToken = fcmToken;
+        await user.save();
     }
 
     const isMatched = await comparePassword(password, user.password);

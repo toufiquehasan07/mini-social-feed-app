@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "240894823976",
+    "project_id": "social-feed-8685f",
+    "storage_bucket": "social-feed-8685f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:240894823976:android:db5d2cbd5a898c9928af1d",
+        "android_client_info": {
+          "package_name": "com.anonymous.socialfeed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcyjFYPt0ahW38CkS6-uq5xZTAcBUq_MA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

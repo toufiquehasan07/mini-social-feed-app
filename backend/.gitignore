@@ -39,3 +39,4 @@ Thumbs.db
 # Optional
 *.swp
 *.swo
+serviceAccountKey.json

@@ -213,8 +213,6 @@ exports.createComment = async (req, res) => {
             _id: newComment._id,
         }).populate('user', 'name email username');
 
-        console.log('info comment details: ', commentDetails);
-
         return res.status(200).json({
             success: true,
             message: 'Comment created successfully',

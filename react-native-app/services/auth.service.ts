@@ -16,7 +16,7 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
         const response = await axios({
             method: 'POST',
-            url: `${APP_CONFIG.serverUrl}:${APP_CONFIG.port}/api/${APP_CONFIG.apiVersion}/auth/token/refresh`,
+            url: `${APP_CONFIG.serverUrl}/api/${APP_CONFIG.apiVersion}/auth/token/refresh`,
             headers: {
                 'Content-Type': 'application/json',
             },

@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { APP_CONFIG } from '@/config';
 import { refreshAccessToken, logout, getAccessToken } from './auth.service';
 
-const baseURL = `${APP_CONFIG.serverUrl}:${APP_CONFIG.port}/api/${APP_CONFIG.apiVersion}`;
+const baseURL = `${APP_CONFIG.serverUrl}/api/${APP_CONFIG.apiVersion}`;
 const headers = {
     'Content-Type': 'application/json',
 };
