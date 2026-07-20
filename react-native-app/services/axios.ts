@@ -36,29 +36,22 @@ export const axiosAuthClient = async (
             // console.log('Status:', error.response?.status);
             // console.log('URL:', error.config?.url);
             const config = error.config;
-
             if (error.response?.status === 401 && !config.sent) {
                 config.sent = true;
-
                 const accessToken = await refreshAccessToken();
-
                 if (!accessToken) {
                     await logout();
                     return Promise.reject(error);
                 }
-
                 config.headers = {
                     ...config.headers,
                     Authorization: `Bearer ${accessToken}`,
                 };
-
                 return axiosInstance(config);
             }
-
             return Promise.reject(error);
         },
     );
-
     return axiosInstance(config);
 };
 

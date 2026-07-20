@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Avatar from '@/components/Avatar';
 import PostCard from '@/components/PostCard';
 import { Colors, FontSize, Spacing } from '@/constants/theme';
-import { fetchPosts, selectPosts, selectPostsStatus } from '@/store/postsSlice';
+import { fetchPosts, selectPosts, selectPostsStatus, toggleLikeThunk } from '@/store/postsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUser } from '@/store/authSlice';
 import { FAB } from 'react-native-paper';
@@ -85,7 +85,9 @@ export default function FeedScreen() {
                 data={filteredPosts}
                 keyExtractor={(item: any) => item._id}
                 renderItem={({ item }) => (
-                    <PostCard post={item} onLike={() => {}} />
+                    <PostCard post={item} onLike={() => dispatch(toggleLikeThunk(item._id))}
+                    // onComment={() => handleComment(item._id)} 
+                    />
                 )}
                 refreshing={status === 'loading'}
                 onRefresh={() => dispatch(fetchPosts())}

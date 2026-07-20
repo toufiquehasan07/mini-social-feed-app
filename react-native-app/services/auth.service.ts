@@ -1,11 +1,11 @@
-import axios from "axios";
-import { APP_CONFIG } from "@/config";
-import storageService from "./storage";
+import axios from 'axios';
+import { APP_CONFIG } from '@/config';
+import storageService from './storage';
 import { User } from '@/types/index';
 
-const ACCESS_TOKEN_KEY = "access_token";
-const REFRESH_TOKEN_KEY = "refresh_token";
-const USER_KEY = "user";
+const ACCESS_TOKEN_KEY = 'access_token';
+const REFRESH_TOKEN_KEY = 'refresh_token';
+const USER_KEY = 'user';
 
 export const refreshAccessToken = async (): Promise<string | null> => {
     try {
@@ -15,16 +15,15 @@ export const refreshAccessToken = async (): Promise<string | null> => {
         }
 
         const response = await axios({
-            method: "POST",
-            url: `${APP_CONFIG.serverUrl}:${APP_CONFIG.port}/api/${APP_CONFIG.apiVersion}/token/refresh`,
+            method: 'POST',
+            url: `${APP_CONFIG.serverUrl}:${APP_CONFIG.port}/api/${APP_CONFIG.apiVersion}/auth/token/refresh`,
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             data: {
-                token: refreshToken
-            }
-        })
-
+                token: refreshToken,
+            },
+        });
         const accessToken = response.data?.data?.accessToken;
 
         if (!accessToken) {
@@ -36,10 +35,11 @@ export const refreshAccessToken = async (): Promise<string | null> => {
         return null;
     }
 };
+
 export const saveSession = async (
     user: User,
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
 ) => {
     await storageService.save(USER_KEY, JSON.stringify(user));
     await storageService.save(ACCESS_TOKEN_KEY, accessToken);
@@ -63,7 +63,7 @@ export const getRefreshToken = async () => {
 };
 
 export const logout = async () => {
-    console.log("info logout called.");
+    // console.log('info logout called.');
     await storageService.remove(USER_KEY);
     await storageService.remove(ACCESS_TOKEN_KEY);
     await storageService.remove(REFRESH_TOKEN_KEY);

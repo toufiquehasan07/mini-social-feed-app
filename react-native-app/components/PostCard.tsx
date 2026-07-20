@@ -57,7 +57,7 @@ const PostCard = ({ post, onLike }: Props) => {
 
                         <Pressable
                             style={styles.action}
-                            onPress={() => router.push(`/comments/${post.id}`)}
+                            onPress={() => router.push(`/comments/${post._id}`)}
                         >
                             <Feather
                                 name="message-circle"

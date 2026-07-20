@@ -1,6 +1,6 @@
 import { axiosAuthClient, axiosClient } from './axios';
 import { AUTH_LOGIN, AUTH_SIGNUP, NOTIFICATION, POSTS } from '@/constants/endpoints';
-import { AuthResponse, Post } from '@/types';
+import { AuthResponse, Comment, Post, ToggleLikeResponse } from '@/types';
 
 export const login = async (payload: {
     email: string;
@@ -57,3 +57,29 @@ export const getUserNotifications = async (): Promise<Notification[]> => {
     // console.log('info get notification data: ', data);
     return data?.data;
 };
+
+export const toggleLike = async (id: string): Promise<ToggleLikeResponse> => {
+    const { data } = await axiosAuthClient({
+        method: 'POST',
+        url: `${POSTS}/${id}/like`,
+    });
+    // console.log('info data: ', data);
+    return data?.data;
+};
+
+export const createComment = async (payload: {
+    postId: string,
+    message: string
+}): Promise<Comment> => {
+    const { data } = await axiosAuthClient({
+        method: 'POST',
+        url: `${POSTS}/${payload.postId}/comment`,
+        data: {
+            message: payload.message
+        }
+    });
+    // console.log('info data: ', data);
+    return data?.data;
+};
+
+

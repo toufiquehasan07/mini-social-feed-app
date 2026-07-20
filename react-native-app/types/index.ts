@@ -23,6 +23,13 @@ export interface AuthResponse {
     refreshToken: string;
 }
 
+export interface Comment extends Response {
+    _id: string;
+    message: string;
+    post: string;
+    user: ResponseUser;
+}
+
 export interface Post extends Response {
     _id: string;
     author: {
@@ -35,15 +42,7 @@ export interface Post extends Response {
     likes: number;
     liked: boolean;
     commented: boolean;
-    comments: any[];
-}
-
-export interface Comment {
-    id: string;
-    userId: string;
-    user: User;
-    text: string;
-    time: string;
+    comments: Comment[];
 }
 
 interface ResponseUser extends User {
@@ -56,4 +55,10 @@ export interface Notification extends Response {
     from: ResponseUser,
     to: ResponseUser,
     post: ResponseUser,
+}
+
+export interface ToggleLikeResponse {
+    postId: string
+    liked: boolean,
+    likes: number
 }
