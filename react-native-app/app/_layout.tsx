@@ -1,5 +1,9 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import {
+    DarkTheme,
+    DefaultTheme,
+    ThemeProvider,
+} from '@react-navigation/native';
+import { Stack, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -10,43 +14,63 @@ import { getUser } from '@/services/auth.service';
 import { restoreSession } from '@/store/authSlice';
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+    anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loading, setLoading] = useState(true);
-  const [initialRoute, setInitialRoute] = useState<"(auth)" | "(tabs)">("(auth)");
+    const colorScheme = useColorScheme();
+    const [loading, setLoading] = useState(true);
+    const [initialRoute, setInitialRoute] = useState<'(auth)' | '(tabs)'>(
+        '(auth)',
+    );
 
-  useEffect(() => {
-    const bootstrap = async () => {
-      const user = await getUser();
+    useEffect(() => {
+        const bootstrap = async () => {
+            const user = await getUser();
 
-      if (user) {
-        store.dispatch(restoreSession(user));
-        setInitialRoute("(tabs)");
-      } else {
-        setInitialRoute("(auth)");
-      }
-      setLoading(false);
-    };
+            if (user) {
+                store.dispatch(restoreSession(user));
+                setInitialRoute('(tabs)');
+            } else {
+                setInitialRoute('(auth)');
+            }
+            setLoading(false);
+        };
 
-    bootstrap();
-  }, []);
+        bootstrap();
+    }, []);
 
-  if (loading) {
-    return null;
-  }
+    if (loading) {
+        return null;
+    }
 
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Provider store={store}>
-        <Stack initialRouteName={initialRoute}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-        <StatusBar style="auto" />
-      </Provider>
-    </ThemeProvider>
-  );
+    return (
+        <ThemeProvider
+            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+            <Provider store={store}>
+                <Stack initialRouteName={initialRoute}>
+                    <Stack.Screen
+                        name="(auth)"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="create"
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="comments/[id]"
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+                </Stack>
+                <StatusBar style="auto" />
+            </Provider>
+        </ThemeProvider>
+    );
 }

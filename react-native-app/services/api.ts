@@ -1,5 +1,10 @@
 import { axiosAuthClient, axiosClient } from './axios';
-import { AUTH_LOGIN, AUTH_SIGNUP, NOTIFICATION, POSTS } from '@/constants/endpoints';
+import {
+    AUTH_LOGIN,
+    AUTH_SIGNUP,
+    NOTIFICATION,
+    POSTS,
+} from '@/constants/endpoints';
 import { AuthResponse, Comment, Post, ToggleLikeResponse } from '@/types';
 
 export const login = async (payload: {
@@ -68,18 +73,32 @@ export const toggleLike = async (id: string): Promise<ToggleLikeResponse> => {
 };
 
 export const createComment = async (payload: {
-    postId: string,
-    message: string
+    postId: string;
+    message: string;
 }): Promise<Comment> => {
     const { data } = await axiosAuthClient({
         method: 'POST',
         url: `${POSTS}/${payload.postId}/comment`,
         data: {
-            message: payload.message
-        }
+            message: payload.message,
+        },
     });
     // console.log('info data: ', data);
     return data?.data;
 };
 
-
+export const refreshFcmToken = async (
+    token: string,
+): Promise<{
+    success: boolean;
+    message: string;
+}> => {
+    const { data } = await axiosAuthClient({
+        method: 'PUT',
+        url: `${NOTIFICATION}/fcm-token`,
+        data: {
+            token,
+        },
+    });
+    return data;
+};

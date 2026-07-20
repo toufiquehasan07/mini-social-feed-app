@@ -45,7 +45,7 @@ export default function CommentsScreen() {
                 }),
             ).unwrap();
             setText('');
-            router.back();
+            // router.back();
         } catch (err) {
             console.error('Failed to create comment:', err);
         }
@@ -64,6 +64,7 @@ export default function CommentsScreen() {
             >
                 <FlatList
                     data={comments}
+                    keyboardShouldPersistTaps="handled"
                     keyExtractor={(item) => item._id}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={styles.list}
@@ -137,7 +138,7 @@ const styles = StyleSheet.create({
 
     list: {
         padding: 16,
-        paddingBottom: 90,
+        paddingBottom: 100,
     },
 
     username: {
