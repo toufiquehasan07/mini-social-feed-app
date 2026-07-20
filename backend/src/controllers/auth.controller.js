@@ -72,6 +72,7 @@ exports.login = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
     const { token } = req.body;
+    // console.log('1. info server got refresh token: ', token);
 
     if (!token) {
         return res.status(401).json({
@@ -82,7 +83,10 @@ exports.refreshToken = async (req, res) => {
 
     try {
         const decoded = jwt.verifyRefreshToken(token);
-        const newAccessToken = jwt.generateAccessToken(decoded);
+        // console.log('2. abled to decoded token: ', decoded);
+
+        const newAccessToken = jwt.generateAccessToken({ _id: decoded.id });
+        // console.log('3. abled to generate new access token: ', decoded);
         return res.status(200).json({
             success: true,
             message: 'Token refreshed successfully.',
@@ -93,6 +97,7 @@ exports.refreshToken = async (req, res) => {
             },
         });
     } catch (err) {
+        console.error('Error in refresh token: ', err);
         return res.status(401).json({
             success: false,
             message: 'Invalid or expired refresh token',

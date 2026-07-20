@@ -5,7 +5,8 @@ exports.createNotification = async (fromId, postId, type, toId) => {
         return null;
     }
 
-    if (fromId === toId) return null;
+    // console.log('info from and to id: ', fromId, toId);
+    if (fromId === toId.toString()) return null;
 
     try {
         const newNotification = await Notification.create({
@@ -14,7 +15,6 @@ exports.createNotification = async (fromId, postId, type, toId) => {
             post: postId,
             type,
         });
-        // console.log('info new notification: ', newNotification);
         return newNotification;
     } catch (err) {
         console.error('Error creating notification:', err);

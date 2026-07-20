@@ -2,6 +2,13 @@ const Post = require('../models/Post');
 const Like = require('../models/Like');
 const Comment = require('../models/Comment');
 const { parsePosts } = require('../utils/parser.js');
+const { createNotification } = require('../services/notification.service.js');
+
+const NOTIFICATION_TYPE = {
+    liked: 'liked',
+    disliked: 'disliked',
+    commented: 'commented',
+};
 
 exports.getAll = async (req, res) => {
     try {
@@ -12,7 +19,7 @@ exports.getAll = async (req, res) => {
             .populate('author', 'name username email')
             .sort({ createdAt: -1 });
 
-        // console.log('db fatched posts: ', posts);
+        // console.log('db fetched posts: ', posts);
 
         const postIds = posts.map((post) => post._id);
         // console.log('postIds: ', postIds);
@@ -24,7 +31,7 @@ exports.getAll = async (req, res) => {
             post: { $in: postIds },
         }).populate('user', 'name username email');
 
-        const data = parsePosts(posts, likes, comments, userId); // parse and prepare responseable post
+        const data = parsePosts(posts, likes, comments, userId); // parse and prepare responsible post
 
         return res.status(200).json({
             success: true,
@@ -52,25 +59,31 @@ exports.create = async (req, res) => {
         });
     }
 
-    const newPost = await Post.create({
-        author: user.id,
-        content,
-    });
+    try {
+        const newPost = await Post.create({
+            author: user.id,
+            content,
+        });
 
-    return res.status(200).json({
-        success: true,
-        message: 'Post created successfully',
-        data: {
-            post: newPost,
-        },
-    });
+        return res.status(200).json({
+            success: true,
+            message: 'Post created successfully',
+            data: newPost,
+        });
+    } catch (err) {
+        console.error('error in creating post: ', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to create post',
+        });
+    }
 };
 
-exports.toogleLike = async (req, res) => {
-    const user = req.user;
-    const userId = user?.id;
+exports.toggleLike = async (req, res) => {
+    const userId = req.user?.id;
+    // console.log('info userId: ', userId);
     const { id: postId } = req.params;
-    // console.log("info postid: ", req.params, postId);
+    // console.log('info userId: ', postId);
 
     if (!postId || !userId) {
         return res.status(400).json({
@@ -80,8 +93,12 @@ exports.toogleLike = async (req, res) => {
     }
 
     try {
-        const postExists = await Post.exists({ _id: postId });
-        if (!postExists) {
+        const post = await Post.findById(postId).populate(
+            'author',
+            'name username email',
+        );
+
+        if (!post) {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found',
@@ -93,38 +110,58 @@ exports.toogleLike = async (req, res) => {
             post: postId,
         });
 
+        let liked = false;
+
         if (alreadyLiked) {
             await Like.deleteOne({
                 user: userId,
                 post: postId,
             });
 
-            return res.status(200).json({
-                success: true,
-                message: 'Post unliked successfully',
-                data: {
-                    liked: false,
-                },
+            liked = false;
+
+            await createNotification(
+                userId,
+                postId,
+                NOTIFICATION_TYPE.disliked,
+                post.author._id,
+            );
+        } else {
+            await Like.create({
+                user: userId,
+                post: postId,
             });
+
+            liked = true;
+
+            await createNotification(
+                userId,
+                postId,
+                NOTIFICATION_TYPE.liked,
+                post.author._id,
+            );
         }
 
-        await Like.create({
-            user: userId,
+        const likes = await Like.countDocuments({
             post: postId,
         });
 
         return res.status(200).json({
             success: true,
-            message: 'Post liked successfully',
+            message: liked
+                ? 'Post liked successfully'
+                : 'Post disliked successfully',
             data: {
-                liked: true,
+                postId,
+                liked,
+                likes,
             },
         });
     } catch (err) {
         console.error('Error in like or unlike:', err);
         return res.status(500).json({
             success: false,
-            message: 'Failed to toogle like.',
+            message: 'Failed to toggle like.',
         });
     }
 };
@@ -136,9 +173,9 @@ exports.createComment = async (req, res) => {
 
     // console.log('info post id params: ', postId, req.params);
 
-    const trimedMessage = message?.trim();
+    const trimmedMessage = message?.trim();
 
-    if (!userId || !postId || !trimedMessage) {
+    if (!userId || !postId || !trimmedMessage) {
         return res.status(400).json({
             success: false,
             message: 'Missing required params',
@@ -146,15 +183,42 @@ exports.createComment = async (req, res) => {
     }
 
     try {
+        const post = await Post.findOne({ _id: postId }).populate(
+            'author',
+            'name username email',
+        );
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found',
+            });
+        }
+
         const newComment = await Comment.create({
             user: userId,
             post: postId,
-            message: trimedMessage,
+            message: trimmedMessage,
         });
+
+        // fromId, postId, type, toId
+        await createNotification(
+            userId,
+            postId,
+            NOTIFICATION_TYPE.commented,
+            post.author._id,
+        );
+
+        const commentDetails = await Comment.findOne({
+            _id: newComment._id,
+        }).populate('user', 'name email username');
+
+        console.log('info comment details: ', commentDetails);
+
         return res.status(200).json({
             success: true,
             message: 'Comment created successfully',
-            data: newComment,
+            data: commentDetails,
         });
     } catch (err) {
         console.error('Error in creating comment', err);

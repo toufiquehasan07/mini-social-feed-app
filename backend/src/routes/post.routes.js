@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/', postController.create);
 router.get('/', postController.getAll);
-router.post('/:id/like', postController.toogleLike);
+router.post('/:id/like', postController.toggleLike);
 router.post('/:id/comment', postController.createComment);
 
 module.exports = router;
