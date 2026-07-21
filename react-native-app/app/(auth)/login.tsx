@@ -37,9 +37,12 @@ const LoginScreen = () => {
                 }),
             ).unwrap();
 
-            router.replace('/(tabs)');
+            router.replace('/(tabs)/home');
         } catch (error: any) {
-            Alert.alert('Login Failed', error?.message || 'Something went wrong.');
+            Alert.alert(
+                'Login Failed',
+                error?.message || 'Something went wrong.',
+            );
         }
     };
 
